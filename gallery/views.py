@@ -11,16 +11,18 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import (
     CreateImageSerializer, CreateVideoSerializer,
     GalleryImageSerializer, GalleryVideoSerializer,
-    PostSerializer, PostSerializerList,
+    PostSerializer, PostSerializerList, ImageSerializer,
     CreateImgSerializer
 )
 from .models import (
     Post,
     PostImg, PostVideo,
     GalleryVideo, GalleryImg,
+    Image
 )
 from .permissions import IsOwner
 
@@ -71,6 +73,7 @@ class ListIMGGallery(mixins.CreateModelMixin, generics.ListAPIView):
     permission_classes = []
     serializer_class = GalleryImageSerializer
     passed_id = None
+    parser_classes = (MultiPartParser, FormParser)
 
     def get_queryset(self):
         request = self.request
@@ -133,6 +136,28 @@ class DetailPost(
     def put(self, *args, **kwargs):
         return self.update(*args, **kwargs)
 
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
     def patch(self, *args, **kwargs):
         return self.update(*args, **kwargs)
+
+
+class ImageL(mixins.CreateModelMixin, generics.ListAPIView):
+    parser_classes = (MultiPartParser, FormParser)
+    serializer_class = ImageSerializer
+
+    def get_queryset(self):
+        request = self.request
+        qs = Image.objects.all()
+        query = request.GET.get('q')
+        if query is not None:
+            qs = qs.filter(content__icontains=query)
+        return qs
+
+
+
+    def post(self, *args, **kwargs):
+        return self.create(*args, **kwargs)
+
 

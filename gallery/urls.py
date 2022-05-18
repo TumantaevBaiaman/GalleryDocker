@@ -3,7 +3,8 @@ from django.urls import path
 from .views import (
     ListIMG, ListVideo,
     ListIMGGallery, ListPost,
-    DetailPost, ListVideoGallery
+    DetailPost, ListVideoGallery,
+    ImageL
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('create/video/', ListVideo.as_view(), name='create_video'),
     path('gallery/img/', ListIMGGallery.as_view(), name='gallery_img'),
     path('gallery/video', ListVideoGallery.as_view(), name='gallery_video'),
+    path('posts/', ImageL.as_view(), name='posts'),
 ]

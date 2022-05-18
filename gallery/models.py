@@ -2,14 +2,24 @@ from django.db import models
 from django.core.validators import FileExtensionValidator
 from django.db.models import Sum
 from django.urls import reverse
-from pytz import unicode
 from rest_framework.exceptions import ValidationError
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
 class Post(models.Model):
+    account_category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     update = models.DateTimeField(auto_now=True)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-update']
 
     def __str__(self):
         return f"{self.name}"
@@ -89,6 +99,25 @@ class PostVideo(models.Model):
 
     def __str__(self):
         return f"{self.gallery}"
+
+
+class Image(models.Model):
+    img = models.ImageField(upload_to='post_image')
+    video_test = models.FileField(
+        upload_to='posts_video',
+        validators=[FileExtensionValidator(allowed_extensions=['mp4'])]
+    )
+    title = models.CharField(max_length=255)
+    update = models.DateTimeField(auto_now=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-update']
+
+    def __str__(self):
+        return f"{self.title}"
+
+
 
 
 

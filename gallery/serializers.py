@@ -4,7 +4,9 @@ from rest_framework.reverse import reverse
 from .models import (
     Post,
     PostImg, GalleryImg,
-    PostVideo, GalleryVideo
+    PostVideo, GalleryVideo,
+    Image,
+    Category
 )
 #  git stash
 #  git pull origin master
@@ -53,14 +55,15 @@ class CreateVideoSerializer(serializers.ModelSerializer):
 
 
 class GalleryImageSerializer(serializers.ModelSerializer):
-    post = serializers.StringRelatedField()
-    img = CreateImageSerializer(many=True)
+    img = CreateImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = GalleryImg
         fields = [
-            'post', 'img'
+            'id', 'post', 'img'
         ]
+
+
 
 
 class GalleryVideoSerializer(serializers.ModelSerializer):
@@ -70,7 +73,7 @@ class GalleryVideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = GalleryVideo
         fields = [
-            'post', 'video'
+            'id', 'post', 'video'
         ]
 
 
@@ -83,11 +86,13 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
-            'name', 'gallery_img', 'gallery_video'
+            'id', 'name', 'gallery_img', 'gallery_video'
         ]
 
 
 class PostSerializerList(serializers.ModelSerializer):
+    gallery_img = GalleryImageSerializer(many=True, read_only=True)
+    gallery_video = GalleryVideoSerializer(many=True, read_only=True)
     url = serializers.SerializerMethodField(read_only=True)
 
     def get_url(self, obj):
@@ -97,5 +102,11 @@ class PostSerializerList(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
-            'name', 'url'
+            'id', 'name', 'url', 'gallery_img', 'gallery_video', 'account_category'
         ]
+
+class ImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Image
+        fields = '__all__'
